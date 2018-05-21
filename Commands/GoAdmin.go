@@ -23,17 +23,17 @@ func NewCmdGoAdmin(cfg *config.Config, inBotCtx *bot.Context) (*CmdGoAdmin){
 }
 
 func (this* CmdGoAdmin) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
-    tokens := strings.Split(cmd.Message(), " ")
+    tokens := PrepareMessage(cmd.Message())
     if len(tokens) == 0 {
         return false
     }
-    if strings.ToLower(tokens[0]) != "goadmin" {
+    if tokens[0] != "goadmin" {
         return false
     }
     
     var passArg string = ""
     if len(tokens) > 1 {
-        passArg = tokens[1]
+        passArg = strings.Trim(tokens[1], " ")
     }
     
     pass, ok := this.AdminsList[cmd.User()]

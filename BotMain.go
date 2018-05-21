@@ -7,21 +7,9 @@ import "./Commands"
 import "./Telegram"
 import "log"
 
-type AppContext struct {
-    waiting chan bool
-    admins  map[string]bool
-}
-
-type CmdStop struct {
-    app *AppContext
-}
-
-type CmdGoAdmin struct {
-}
-
 func main() {
-    botCtx := bot.Context { make(map[string]bool) }
-    appCtx := AppContext { waiting: make(chan bool) }
+    botCtx := bot.Context { Admins  : make(map[string]bool),
+                            Waiting : make(chan bool) }
 
     log.Print("----- Start -----")
 
@@ -32,7 +20,8 @@ func main() {
         return
     }
     
-    cmdStop := &CmdStop { app : &appCtx }
+    // Create and registrate commands
+    cmdStop := commands.NewCmdStop(&botCtx)
     cmdGoAdmin := commands.NewCmdGoAdmin(cfg, &botCtx)
     cmds := map[string]cmdprocessor.CommandProcIf {
         "stop":    cmdStop,
@@ -61,7 +50,7 @@ func main() {
         }
     }
 
-    _ = <- appCtx.waiting
+    _ = <- botCtx.Waiting
     log.Print("----- Stop command received -----")
 
     if tgListener != nil {
@@ -69,19 +58,4 @@ func main() {
     }
 
     log.Print("----- Stop -----")
-}
-/*
-func (this *CmdStop) Name() (string) {
-    return "stop"
-}
-*/
-func (this* CmdStop) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
-    if cmd.Message() != "stop" {
-        return false
-    }
-
-    cmd.Reply("Ok, I'll stop")
-
-    this.app.waiting <- false
-    return true
 }

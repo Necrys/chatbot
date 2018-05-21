@@ -10,7 +10,6 @@ type CommandCtxIf interface {
 }
 
 type CommandProcIf interface {
-//    Name() (string)
     HandleCommand(CommandCtxIf) (bool)
 }
 
