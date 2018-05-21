@@ -29,6 +29,7 @@ func main() {
     cfg, err := config.Read("config.json")
     if err != nil {
         log.Print("Failed to read configuration from file")
+        return
     }
     
     cmdStop := &CmdStop { app : &appCtx }
@@ -53,7 +54,8 @@ func main() {
     if cfg.Telegram.Token != "" {
         tgListener, err = telegram.NewListener(cfg)
         if err != nil {
-            log.Print("Failed to read configuration from file: ", err)
+            log.Print("Failed to init telegram listener: ", err)
+            return
         } else {
             tgListener.Start(cmdHandler)
         }

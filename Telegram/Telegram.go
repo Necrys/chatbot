@@ -24,8 +24,8 @@ func NewListener(cfg *config.Config) (*Listener, error) {
     this := &Listener { bot: nil }
 
     if cfg.Telegram.ProxySettings.Server != "" {
-        auth := proxy.Auth { User: cfg.Telegram.ProxySettings.User,
-                             Password: cfg.Telegram.ProxySettings.Pass }
+        auth := proxy.Auth { User     : cfg.Telegram.ProxySettings.User,
+                             Password : cfg.Telegram.ProxySettings.Password }
         dialer, err := proxy.SOCKS5("tcp", cfg.Telegram.ProxySettings.Server, &auth, proxy.Direct)
         if err != nil {
             return nil, errors.New("Failed to init SOCKS5 proxy dialer")

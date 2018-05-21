@@ -38,15 +38,15 @@ func (this* CmdGoAdmin) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
     
     pass, ok := this.AdminsList[cmd.User()]
     if ok != true {
-        cmd.Reply(fmt.Sprintf("You're not The Master, ", cmd.User()))
+        cmd.Reply(fmt.Sprintf("You're not The Master, @%s", cmd.User()))
         return true
     }
 
     if pass != passArg {
-        cmd.Reply(fmt.Sprintf("Invalid password, ", cmd.User()))
+        cmd.Reply(fmt.Sprintf("Invalid password, @%s", cmd.User()))
     } else {
         this.botCtx.Admins[cmd.User()] = true
-        cmd.Reply(fmt.Sprintf("I serve You, ", cmd.User()))
+        cmd.Reply(fmt.Sprintf("I serve You, @%s", cmd.User()))
     }
 
     return true
