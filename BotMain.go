@@ -26,12 +26,14 @@ func main() {
     cmds := map[string]cmdprocessor.CommandProcIf {
         "stop":    cmdStop,
         "goadmin": cmdGoAdmin,
+        "noadmin": commands.NewCmdNoAdmin(&botCtx),
     }
     
     // Append some basic commands to the config so it'll be registered always.
     // Not a good solution but will work at this point
     cfg.Commands = append(cfg.Commands, "stop")
     cfg.Commands = append(cfg.Commands, "goadmin")
+    cfg.Commands = append(cfg.Commands, "noadmin")
     
     cmdHandler, err := cmdprocessor.NewCmdRegistry(cfg, cmds)
     if err != nil {

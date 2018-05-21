@@ -11,7 +11,7 @@ type CmdGoAdmin struct {
     AdminsList map[string]string
 }
 
-func NewCmdGoAdmin(cfg *config.Config, inBotCtx *bot.Context) (*CmdGoAdmin){
+func NewCmdGoAdmin(cfg *config.Config, inBotCtx *bot.Context) (*CmdGoAdmin) {
     this := &CmdGoAdmin { botCtx:     inBotCtx, 
                           AdminsList: make(map[string]string) }
     
