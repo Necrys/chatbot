@@ -4,9 +4,9 @@ import "encoding/json"
 import "io/ioutil"
 
 type CfgProxySettings struct {
-    Server string
-    User   string
-    Pass   string
+    Server   string
+    User     string
+    Password string
 }
 
 type CfgTelegramSettings struct {

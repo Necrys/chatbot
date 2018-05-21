@@ -1,0 +1,17 @@
+{
+    "Telegram": {
+        "Token"         : "YourTelegramToken",
+        "ProxySettings" : {
+            "Server"    : "socks.proxy.server",
+            "User"      : "user",
+            "Password"  : "password"
+        }
+    },
+    "Commands": [
+        "SomeCmd"
+    ],
+    "Admins": [{
+        "UserId"   : "user",
+        "Password" : "password"
+    }]
+}
