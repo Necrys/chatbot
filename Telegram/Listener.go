@@ -9,22 +9,12 @@ import "net/http"
 import "log"
 
 type Listener struct {
-    bot       *tgbotapi.BotAPI
+    api       *tgbotapi.BotAPI
     isRunning bool
 }
 
-type CommandCtx struct {
-    listener *Listener
-    user     string
-    msg      string
-    mid      int
-    cid      int64
-    command  string
-    args     string
-}
-
 func NewListener(cfg *config.Config) (*Listener, error) {
-    this := &Listener { bot: nil }
+    this := &Listener { api: nil }
 
     if cfg.Telegram.ProxySettings.Server != "" {
         auth := proxy.Auth { User     : cfg.Telegram.ProxySettings.User,
@@ -38,17 +28,17 @@ func NewListener(cfg *config.Config) (*Listener, error) {
         httpTransport.Dial = dialer.Dial
         httpClient := &http.Client { Transport: httpTransport }
 
-        bot, err := tgbotapi.NewBotAPIWithClient(cfg.Telegram.Token, httpClient)
+        api, err := tgbotapi.NewBotAPIWithClient(cfg.Telegram.Token, httpClient)
         if err != nil {
-            return nil, errors.New("Failed to init Telegram bot API with proxy")
+            return nil, errors.New("Failed to init Telegram api API with proxy")
         }
-        this.bot = bot
+        this.api = api
     } else {
-        bot, err := tgbotapi.NewBotAPI(cfg.Telegram.Token)
+        api, err := tgbotapi.NewBotAPI(cfg.Telegram.Token)
         if err != nil {
-            return nil, errors.New("Failed to init Telegram bot API")
+            return nil, errors.New("Failed to init Telegram api API")
         }
-        this.bot = bot
+        this.api = api
     }
 
     return this, nil
@@ -59,7 +49,7 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
     u.Timeout = 60
     this.isRunning = true
 
-    updates, err := this.bot.GetUpdatesChan(u)
+    updates, err := this.api.GetUpdatesChan(u)
 
     if err != nil {
         return
@@ -74,7 +64,7 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
 
         log.Printf("update has come (%s)", update.Message.Text)
 
-        cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.bot.Self.UserName)
+        cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.api.Self.UserName)
 
         cmdCtx := &CommandCtx { listener: this,
                                 user:     update.Message.From.UserName,
@@ -90,35 +80,8 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
 
 func (this* Listener) Start(cmdHandler *cmdprocessor.CmdRegistry) () {
     go this.listen(cmdHandler)
-    //this.listen(cmdHandler)
 }
 
 func (this* Listener) Stop() () {
     this.isRunning = false
-}
-
-func (this* CommandCtx) Message() (string) {
-    return this.msg
-}
-
-func (this* CommandCtx) Reply(text string) () {
-    msg := tgbotapi.NewMessage(this.cid, text)
-    msg.ReplyToMessageID = this.mid
-    this.listener.bot.Send(msg)
-}
-
-func (this* CommandCtx) User() (string) {
-    return this.user
-}
-
-func (this* CommandCtx) UserId() (string) {
-    return this.user
-}
-
-func (this* CommandCtx) Command() (string) {
-    return this.command
-}
-
-func (this* CommandCtx) Args() (string) {
-    return this.args
 }
