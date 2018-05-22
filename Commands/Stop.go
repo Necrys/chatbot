@@ -13,10 +13,6 @@ func NewCmdStop(inBotCtx *bot.Context) (*CmdStop) {
 }
 
 func (this* CmdStop) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
-    if cmd.Command() != "stop" {
-        return false
-    }
-
     isadmin := this.botCtx.IsAdmin(cmd.User())
     if isadmin == false {
         cmd.Reply("You're not The Master")

@@ -22,10 +22,6 @@ func NewCmdGoAdmin(cfg *config.Config, inBotCtx *bot.Context) (*CmdGoAdmin) {
 }
 
 func (this* CmdGoAdmin) HandleCommand(cmdCtx cmdprocessor.CommandCtxIf) (bool) {
-    if cmdCtx.Command() != "goadmin" {
-        return false
-    }
-    
     pass, ok := this.AdminsList[cmdCtx.User()]
     if ok != true {
         cmdCtx.Reply(fmt.Sprintf("You're not The Master, @%s", cmdCtx.User()))
