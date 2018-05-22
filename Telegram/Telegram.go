@@ -6,6 +6,7 @@ import "github.com/go-telegram-bot-api/telegram-bot-api"
 import "golang.org/x/net/proxy"
 import "errors"
 import "net/http"
+import "log"
 
 type Listener struct {
     bot       *tgbotapi.BotAPI
@@ -65,23 +66,25 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
     }
 
     for this.isRunning {
-        for update := range updates {
-            if update.Message == nil {
-              continue
-            }
+        update := <- updates
 
-            cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text)
-
-            cmdCtx := &CommandCtx { listener: this,
-                                    user:     update.Message.From.UserName,
-                                    msg:      update.Message.Text,
-                                    mid:      update.Message.MessageID,
-                                    cid:      update.Message.Chat.ID,
-                                    command:  cmd,
-                                    args:     args }
-
-            cmdHandler.HandleCommand(cmdCtx)
+        if update.Message == nil {
+            continue
         }
+
+        log.Printf("update has come (%s)", update.Message.Text)
+
+        cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text)
+
+        cmdCtx := &CommandCtx { listener: this,
+                                user:     update.Message.From.UserName,
+                                msg:      update.Message.Text,
+                                mid:      update.Message.MessageID,
+                                cid:      update.Message.Chat.ID,
+                                command:  cmd,
+                                args:     args }
+
+        cmdHandler.HandleCommand(cmdCtx)
     }
 }
 
