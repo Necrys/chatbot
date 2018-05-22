@@ -8,6 +8,7 @@ type CommandCtxIf interface {
     Reply(string) ()
     Message() (string)
     User() (string)
+    UserId() (string)
     Command() (string)
     Args() (string)
 }

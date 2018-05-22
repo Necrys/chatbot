@@ -14,6 +14,10 @@ type CfgTelegramSettings struct {
     ProxySettings CfgProxySettings
 }
 
+type CfgSlackSettings struct {
+    Token string
+}
+
 type CfgAdmin struct {
     UserId   string
     Password string
@@ -21,8 +25,10 @@ type CfgAdmin struct {
 
 type Config struct {
     Telegram CfgTelegramSettings
+    Slack    CfgSlackSettings
     Commands []string
     Admins   []CfgAdmin
+    Debug    bool
 }
 
 func Read(cfgPath string) (*Config, error) {

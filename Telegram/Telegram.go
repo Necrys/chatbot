@@ -111,6 +111,10 @@ func (this* CommandCtx) User() (string) {
     return this.user
 }
 
+func (this* CommandCtx) UserId() (string) {
+    return this.user
+}
+
 func (this* CommandCtx) Command() (string) {
     return this.command
 }

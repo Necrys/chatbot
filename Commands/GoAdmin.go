@@ -22,7 +22,7 @@ func NewCmdGoAdmin(cfg *config.Config, inBotCtx *bot.Context) (*CmdGoAdmin) {
 }
 
 func (this* CmdGoAdmin) HandleCommand(cmdCtx cmdprocessor.CommandCtxIf) (bool) {
-    pass, ok := this.AdminsList[cmdCtx.User()]
+    pass, ok := this.AdminsList[cmdCtx.UserId()]
     if ok != true {
         cmdCtx.Reply(fmt.Sprintf("You're not The Master, @%s", cmdCtx.User()))
         return true
@@ -31,7 +31,7 @@ func (this* CmdGoAdmin) HandleCommand(cmdCtx cmdprocessor.CommandCtxIf) (bool) {
     if pass != cmdCtx.Args() {
         cmdCtx.Reply(fmt.Sprintf("Invalid password, @%s", cmdCtx.User()))
     } else {
-        this.botCtx.Admins[cmdCtx.User()] = true
+        this.botCtx.Admins[cmdCtx.UserId()] = true
         cmdCtx.Reply(fmt.Sprintf("I serve You, @%s", cmdCtx.User()))
     }
 

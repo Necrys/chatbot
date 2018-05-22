@@ -5,12 +5,10 @@ import "./Config"
 import "./CmdProcessor"
 import "./Commands"
 import "./Telegram"
+import "./Slack"
 import "log"
 
 func main() {
-    botCtx := bot.Context { Admins  : make(map[string]bool),
-                            Waiting : make(chan bool) }
-
     log.Print("----- Start -----")
 
     log.Print("----- Load config -----")
@@ -20,11 +18,17 @@ func main() {
         return
     }
     
+    botCtx, err := bot.NewContext(cfg)
+    if err != nil {
+        log.Print("Failed to create bot context")
+        return
+    }
+
     // Create and registrate commands
     cmds := map[string]cmdprocessor.CommandProcIf {
-        "stop":    commands.NewCmdStop(&botCtx),
-        "goadmin": commands.NewCmdGoAdmin(cfg, &botCtx),
-        "noadmin": commands.NewCmdNoAdmin(&botCtx),
+        "stop":    commands.NewCmdStop(botCtx),
+        "goadmin": commands.NewCmdGoAdmin(cfg, botCtx),
+        "noadmin": commands.NewCmdNoAdmin(botCtx),
         "roll":    commands.NewCmdRoll(),
     }
     
@@ -39,7 +43,7 @@ func main() {
         log.Print("Failed to create command registry")
         return
     }
-    
+
     var tgListener *telegram.Listener = nil
     if cfg.Telegram.Token != "" {
         tgListener, err = telegram.NewListener(cfg)
@@ -48,6 +52,17 @@ func main() {
             return
         } else {
             tgListener.Start(cmdHandler)
+        }
+    }
+
+    var slackListener *slack.Listener = nil
+    if cfg.Slack.Token != "" {
+        slackListener, err = slack.NewListener(cfg, botCtx)
+        if err != nil {
+            log.Print("Failed to init slack listener: ", err)
+            return
+        } else {
+            slackListener.Start(cmdHandler)
         }
     }
 

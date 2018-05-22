@@ -14,8 +14,8 @@ func NewCmdNoAdmin(inBotCtx *bot.Context) (*CmdNoAdmin) {
 }
 
 func (this* CmdNoAdmin) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
-    this.botCtx.Admins[cmd.User()] = false
-    cmd.Reply(fmt.Sprintf("You're not The Master, @%s", cmd.User()))
+    this.botCtx.Admins[cmd.UserId()] = false
+    cmd.Reply(fmt.Sprintf("You're no more The Master, @%s", cmd.User()))
 
     return true
 }
