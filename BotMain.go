@@ -73,5 +73,9 @@ func main() {
         tgListener.Stop()
     }
 
+    if slackListener != nil {
+        slackListener.Stop()
+    }
+
     log.Print("----- Stop -----")
 }

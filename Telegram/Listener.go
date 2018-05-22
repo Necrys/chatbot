@@ -8,13 +8,24 @@ import "errors"
 import "net/http"
 import "log"
 
+type CmdId int
+
+const (
+    CmdStop = 0
+)
+
+type ListenerCmd struct {
+    id CmdId
+}
+
 type Listener struct {
-    api       *tgbotapi.BotAPI
-    isRunning bool
+    api     *tgbotapi.BotAPI
+    control chan ListenerCmd
 }
 
 func NewListener(cfg *config.Config) (*Listener, error) {
-    this := &Listener { api: nil }
+    this := &Listener { api:     nil,
+                        control: make(chan ListenerCmd) }
 
     if cfg.Telegram.ProxySettings.Server != "" {
         auth := proxy.Auth { User     : cfg.Telegram.ProxySettings.User,
@@ -45,9 +56,11 @@ func NewListener(cfg *config.Config) (*Listener, error) {
 }
 
 func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
+    log.Printf("telegram.Listener: Start listener thread")
+    isRunning := true
+
     u := tgbotapi.NewUpdate(0)
     u.Timeout = 60
-    this.isRunning = true
 
     updates, err := this.api.GetUpdatesChan(u)
 
@@ -55,27 +68,36 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
         return
     }
 
-    for this.isRunning {
-        update := <- updates
+    for isRunning == true {
+        select {
+        case update := <- updates:
+            if update.Message == nil {
+                continue
+            }
 
-        if update.Message == nil {
-            continue
+            log.Printf("update has come (%s)", update.Message.Text)
+
+            cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.api.Self.UserName)
+
+            cmdCtx := &CommandCtx { listener: this,
+                                    user:     update.Message.From.UserName,
+                                    msg:      update.Message.Text,
+                                    mid:      update.Message.MessageID,
+                                    cid:      update.Message.Chat.ID,
+                                    command:  cmd,
+                                    args:     args }
+
+            cmdHandler.HandleCommand(cmdCtx)
+
+        case cmd := <- this.control:
+            if cmd.id == CmdStop {
+                log.Printf("telegram.Listener: Stop command received")
+                isRunning = false
+            }
         }
-
-        log.Printf("update has come (%s)", update.Message.Text)
-
-        cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.api.Self.UserName)
-
-        cmdCtx := &CommandCtx { listener: this,
-                                user:     update.Message.From.UserName,
-                                msg:      update.Message.Text,
-                                mid:      update.Message.MessageID,
-                                cid:      update.Message.Chat.ID,
-                                command:  cmd,
-                                args:     args }
-
-        cmdHandler.HandleCommand(cmdCtx)
     }
+
+    log.Printf("telegram.Listener: Exit listener thread")
 }
 
 func (this* Listener) Start(cmdHandler *cmdprocessor.CmdRegistry) () {
@@ -83,5 +105,5 @@ func (this* Listener) Start(cmdHandler *cmdprocessor.CmdRegistry) () {
 }
 
 func (this* Listener) Stop() () {
-    this.isRunning = false
+    this.control <- ListenerCmd { id: CmdStop }
 }
