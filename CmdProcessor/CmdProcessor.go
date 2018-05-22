@@ -51,14 +51,25 @@ func (this *CmdRegistry) HandleCommand(cmd CommandCtxIf) (bool) {
 
 // split first token and the rest of the message
 // convert first token to lower case
-func SplitCommandAndArgs(message string) (string, string) {
+func SplitCommandAndArgs(message string, botName string) (string, string) {
     tokens := strings.SplitN(strings.Trim(message, " \n\t"), " ", 2)
 
     if len(tokens) == 0 {
         return "", ""
     }
 
-    tokens[0] = strings.ToLower(tokens[0])
+    tokens[0] = strings.ToLower(strings.Trim(tokens[0], "/"))
+
+    // check if it's a direct command to bot
+    // if not, command will be ignored
+    if strings.Contains(tokens[0], "@") == true {
+        cmd := strings.Split(tokens[0], "@")
+        if cmd[1] == botName {
+            tokens[0] = cmd[0]
+        } else {
+            tokens[0] = ""
+        }
+    }
 
     if len(tokens) == 1 {
         return tokens[0], ""

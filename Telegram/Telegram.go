@@ -74,7 +74,7 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
 
         log.Printf("update has come (%s)", update.Message.Text)
 
-        cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text)
+        cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.bot.Self.UserName)
 
         cmdCtx := &CommandCtx { listener: this,
                                 user:     update.Message.From.UserName,
