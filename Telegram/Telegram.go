@@ -18,6 +18,8 @@ type CommandCtx struct {
     msg      string
     mid      int
     cid      int64
+    command  string
+    args     string
 }
 
 func NewListener(cfg *config.Config) (*Listener, error) {
@@ -68,17 +70,17 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
               continue
             }
 
-            //msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-            //msg.ReplyToMessageID = update.Message.MessageID
-            //this.bot.Send(msg)
-            
-            cmd := &CommandCtx { listener: this,
-                                 user:     update.Message.From.UserName,
-                                 msg:      update.Message.Text,
-                                 mid:      update.Message.MessageID,
-                                 cid:      update.Message.Chat.ID }
+            cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text)
 
-            cmdHandler.HandleCommand(cmd)
+            cmdCtx := &CommandCtx { listener: this,
+                                    user:     update.Message.From.UserName,
+                                    msg:      update.Message.Text,
+                                    mid:      update.Message.MessageID,
+                                    cid:      update.Message.Chat.ID,
+                                    command:  cmd,
+                                    args:     args }
+
+            cmdHandler.HandleCommand(cmdCtx)
         }
     }
 }
@@ -104,4 +106,12 @@ func (this* CommandCtx) Reply(text string) () {
 
 func (this* CommandCtx) User() (string) {
     return this.user
+}
+
+func (this* CommandCtx) Command() (string) {
+    return this.command
+}
+
+func (this* CommandCtx) Args() (string) {
+    return this.args
 }

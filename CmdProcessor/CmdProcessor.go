@@ -2,11 +2,14 @@ package cmdprocessor
 
 import "../Config"
 import "errors"
+import "strings"
 
 type CommandCtxIf interface {
     Reply(string) ()
     Message() (string)
     User() (string)
+    Command() (string)
+    Args() (string)
 }
 
 type CommandProcIf interface {
@@ -14,7 +17,7 @@ type CommandProcIf interface {
 }
 
 type CmdRegistry struct {
-    commands []CommandProcIf
+    commands map[string]CommandProcIf
 }
 
 func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*CmdRegistry, error) {
@@ -22,12 +25,12 @@ func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*Cmd
         return nil, errors.New("No command processors passed")
     }
 
-    this := &CmdRegistry{}
+    this := &CmdRegistry{ make(map[string]CommandProcIf) }
 
     for _, v := range cfg.Commands {
         cmd, ok := commands[v]
         if ok == true {
-            this.commands = append(this.commands, cmd)
+            this.commands[v] = cmd
             delete(commands, v)
         }
     }
@@ -36,12 +39,32 @@ func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*Cmd
 }
 
 func (this *CmdRegistry) HandleCommand(cmd CommandCtxIf) (bool) {
-    for _, cmdProc := range this.commands {
-        result := cmdProc.HandleCommand(cmd)
-        if result == true {
-            return true
-        }
+    cmdProc, ok := this.commands[cmd.Command()]
+    if ok != true {
+        return false
     }
 
-    return false
+    go cmdProc.HandleCommand(cmd)
+
+    return true
+}
+
+// split first token and the rest of the message
+// convert first token to lower case
+func SplitCommandAndArgs(message string) (string, string) {
+    tokens := strings.SplitN(strings.Trim(message, " \n\t"), " ", 2)
+
+    if len(tokens) == 0 {
+        return "", ""
+    }
+
+    tokens[0] = strings.ToLower(tokens[0])
+
+    if len(tokens) == 1 {
+        return tokens[0], ""
+    }
+    
+    tokens[1] = strings.Trim(tokens[1], " \n\t")
+
+    return tokens[0], tokens[1]
 }

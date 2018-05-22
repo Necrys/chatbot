@@ -14,11 +14,7 @@ func NewCmdNoAdmin(inBotCtx *bot.Context) (*CmdNoAdmin) {
 }
 
 func (this* CmdNoAdmin) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
-    tokens := PrepareMessage(cmd.Message())
-    if len(tokens) == 0 {
-        return false
-    }
-    if tokens[0] != "noadmin" {
+    if cmd.Command() != "noadmin" {
         return false
     }
     

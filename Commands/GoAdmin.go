@@ -3,7 +3,6 @@ package commands
 import "../Bot"
 import "../Config"
 import "../CmdProcessor"
-import "strings"
 import "fmt"
 
 type CmdGoAdmin struct {
@@ -22,31 +21,22 @@ func NewCmdGoAdmin(cfg *config.Config, inBotCtx *bot.Context) (*CmdGoAdmin) {
     return this
 }
 
-func (this* CmdGoAdmin) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
-    tokens := PrepareMessage(cmd.Message())
-    if len(tokens) == 0 {
-        return false
-    }
-    if tokens[0] != "goadmin" {
+func (this* CmdGoAdmin) HandleCommand(cmdCtx cmdprocessor.CommandCtxIf) (bool) {
+    if cmdCtx.Command() != "goadmin" {
         return false
     }
     
-    var passArg string = ""
-    if len(tokens) > 1 {
-        passArg = strings.Trim(tokens[1], " ")
-    }
-    
-    pass, ok := this.AdminsList[cmd.User()]
+    pass, ok := this.AdminsList[cmdCtx.User()]
     if ok != true {
-        cmd.Reply(fmt.Sprintf("You're not The Master, @%s", cmd.User()))
+        cmdCtx.Reply(fmt.Sprintf("You're not The Master, @%s", cmdCtx.User()))
         return true
     }
 
-    if pass != passArg {
-        cmd.Reply(fmt.Sprintf("Invalid password, @%s", cmd.User()))
+    if pass != cmdCtx.Args() {
+        cmdCtx.Reply(fmt.Sprintf("Invalid password, @%s", cmdCtx.User()))
     } else {
-        this.botCtx.Admins[cmd.User()] = true
-        cmd.Reply(fmt.Sprintf("I serve You, @%s", cmd.User()))
+        this.botCtx.Admins[cmdCtx.User()] = true
+        cmdCtx.Reply(fmt.Sprintf("I serve You, @%s", cmdCtx.User()))
     }
 
     return true

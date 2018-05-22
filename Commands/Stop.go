@@ -13,11 +13,7 @@ func NewCmdStop(inBotCtx *bot.Context) (*CmdStop) {
 }
 
 func (this* CmdStop) HandleCommand(cmd cmdprocessor.CommandCtxIf) (bool) {
-    tokens := PrepareMessage(cmd.Message())
-    if len(tokens) == 0 {
-        return false
-    }
-    if tokens[0] != "stop" {
+    if cmd.Command() != "stop" {
         return false
     }
 
