@@ -21,12 +21,11 @@ func main() {
     }
     
     // Create and registrate commands
-    cmdStop := commands.NewCmdStop(&botCtx)
-    cmdGoAdmin := commands.NewCmdGoAdmin(cfg, &botCtx)
     cmds := map[string]cmdprocessor.CommandProcIf {
-        "stop":    cmdStop,
-        "goadmin": cmdGoAdmin,
+        "stop":    commands.NewCmdStop(&botCtx),
+        "goadmin": commands.NewCmdGoAdmin(cfg, &botCtx),
         "noadmin": commands.NewCmdNoAdmin(&botCtx),
+        "roll":    commands.NewCmdRoll(),
     }
     
     // Append some basic commands to the config so it'll be registered always.
