@@ -25,10 +25,10 @@ type Listener struct {
 }
 
 func NewListener(cfg *config.Config, botCtx *bot.Context) (*Listener, error) {
-    this := &Listener { bot: botCtx }
-    this.control = make(chan ListenerCmd)
-    this.api = slack.New(cfg.Slack.Token)
-    //this.api.SetDebug(botCtx.Debug)
+    this := &Listener { bot:     botCtx,
+                        api:     slack.New(cfg.Slack.Token),
+                        control: make(chan ListenerCmd) }
+
     this.rtm = this.api.NewRTM()
 
     go this.rtm.ManageConnection()
