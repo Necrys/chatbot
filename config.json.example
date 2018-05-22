@@ -7,11 +7,15 @@
             "Password"  : "password"
         }
     },
+    "Slack": {
+        "Token" : "YourSlackToken"
+    },
     "Commands": [
         "SomeCmd"
     ],
     "Admins": [{
         "UserId"   : "user",
         "Password" : "password"
-    }]
+    }],
+    "Debug" : false
 }
