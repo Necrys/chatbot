@@ -65,6 +65,9 @@ func (this *Listener) processEvent(event *slack.RTMEvent, cmdHandler *cmdprocess
     case *slack.ConnectionErrorEvent:
         log.Printf("Error: %s\n", ev.Error())
 
+    case *slack.LatencyReport:
+        // do nothing
+
     default:
         if this.bot.Debug == true {
             dumpEvent(event)
