@@ -46,7 +46,7 @@ func main() {
 
     var tgListener *telegram.Listener = nil
     if cfg.Telegram.Token != "" {
-        tgListener, err = telegram.NewListener(cfg)
+        tgListener, err = telegram.NewListener(cfg, botCtx)
         if err != nil {
             log.Print("Failed to init telegram listener: ", err)
             return
