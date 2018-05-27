@@ -3,12 +3,16 @@ package telegram
 import "../Config"
 import "../CmdProcessor"
 import "../Bot"
+import "../HistoryLogger"
 import "github.com/go-telegram-bot-api/telegram-bot-api"
 import "golang.org/x/net/proxy"
 import "errors"
 import "net/http"
 import "log"
 import "bytes"
+import "time"
+import "fmt"
+import "strings"
 
 type CmdId int
 
@@ -24,12 +28,15 @@ type Listener struct {
     api     *tgbotapi.BotAPI
     control chan ListenerCmd
     bot     *bot.Context
+    logger  *history.ServiceLogger
 }
 
-func NewListener(cfg *config.Config, botCtx *bot.Context) (*Listener, error) {
+func NewListener(cfg *config.Config, botCtx *bot.Context, logger *history.Logger) (*Listener, error) {
     this := &Listener { api:     nil,
                         control: make(chan ListenerCmd),
                         bot:     botCtx }
+
+    this.logger, _ = logger.GetServiceLogger("Telegram")
 
     if cfg.Telegram.ProxySettings.Server != "" {
         auth := proxy.Auth { User     : cfg.Telegram.ProxySettings.User,
@@ -123,6 +130,24 @@ func dumpUpdate(upd *tgbotapi.Update) () {
     }
 }
 
+func (this* Listener) logChatMessage(upd *tgbotapi.Update) () {
+    if this.logger == nil {
+        return
+    }
+
+    chatTitle := strings.Replace(upd.Message.Chat.Title, " ", "_", -1)
+    var chatId string = ""
+    if len(chatTitle) == 0 {
+        chatId = fmt.Sprintf("%x", (uint64)(upd.Message.Chat.ID))
+    } else {
+        chatId = fmt.Sprintf("%x_%v", (uint64)(upd.Message.Chat.ID), chatTitle)
+    }
+
+    this.logger.Printf(chatId, "%v    %v (%v %v): %v",
+        time.Unix((int64)(upd.Message.Date), 0), upd.Message.From.UserName,
+        upd.Message.From.FirstName, upd.Message.From.LastName, upd.Message.Text)
+}
+
 func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
     log.Printf("telegram.Listener: Start listener thread")
     isRunning := true
@@ -146,6 +171,8 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
             if update.Message == nil {
                 continue
             }
+
+            this.logChatMessage(&update)
 
             cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.api.Self.UserName)
 

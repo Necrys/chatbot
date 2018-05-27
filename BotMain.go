@@ -6,6 +6,7 @@ import "./CmdProcessor"
 import "./Commands"
 import "./Telegram"
 import "./Slack"
+import "./HistoryLogger"
 import "log"
 
 func main() {
@@ -44,9 +45,14 @@ func main() {
         return
     }
 
+    history, err := history.NewLogger(cfg)
+    if err != nil {
+        log.Print("Failed to init history logger")
+    }
+
     var tgListener *telegram.Listener = nil
     if cfg.Telegram.Token != "" {
-        tgListener, err = telegram.NewListener(cfg, botCtx)
+        tgListener, err = telegram.NewListener(cfg, botCtx, history)
         if err != nil {
             log.Print("Failed to init telegram listener: ", err)
             return
@@ -57,7 +63,7 @@ func main() {
 
     var slackListener *slack.Listener = nil
     if cfg.Slack.Token != "" {
-        slackListener, err = slack.NewListener(cfg, botCtx)
+        slackListener, err = slack.NewListener(cfg, botCtx, history)
         if err != nil {
             log.Print("Failed to init slack listener: ", err)
             return

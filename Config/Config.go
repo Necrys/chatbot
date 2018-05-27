@@ -23,12 +23,18 @@ type CfgAdmin struct {
     Password string
 }
 
+type CfgHistory struct {
+    Service string
+    Dir     string
+}
+
 type Config struct {
     Telegram CfgTelegramSettings
     Slack    CfgSlackSettings
     Commands []string
     Admins   []CfgAdmin
     Debug    bool
+    History  []CfgHistory
 }
 
 func Read(cfgPath string) (*Config, error) {

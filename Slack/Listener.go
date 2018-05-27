@@ -3,8 +3,8 @@ package slack
 import "../Bot"
 import "../Config"
 import "../CmdProcessor"
+import "../HistoryLogger"
 import "github.com/nlopes/slack"
-//import "errors"
 import "log"
 
 type CmdId int
@@ -22,13 +22,15 @@ type Listener struct {
     api     *slack.Client
     rtm     *slack.RTM
     control chan ListenerCmd
+    logger  *history.ServiceLogger
 }
 
-func NewListener(cfg *config.Config, botCtx *bot.Context) (*Listener, error) {
+func NewListener(cfg *config.Config, botCtx *bot.Context, logger *history.Logger) (*Listener, error) {
     this := &Listener { bot:     botCtx,
                         api:     slack.New(cfg.Slack.Token),
                         control: make(chan ListenerCmd) }
 
+    this.logger, _ = logger.GetServiceLogger("Slack")
     this.rtm = this.api.NewRTM()
 
     go this.rtm.ManageConnection()
