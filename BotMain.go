@@ -7,6 +7,7 @@ import "./Commands"
 import "./Telegram"
 import "./Slack"
 import "./HistoryLogger"
+import "./Api"
 import "log"
 
 func main() {
@@ -25,12 +26,16 @@ func main() {
         return
     }
 
+    // run HTTP API handler
+    api.RunAPIHandler( cfg )
+    
     // Create and registrate commands
     cmds := map[string]cmdprocessor.CommandProcIf {
         "stop":    commands.NewCmdStop(botCtx),
         "goadmin": commands.NewCmdGoAdmin(cfg, botCtx),
         "noadmin": commands.NewCmdNoAdmin(botCtx),
         "roll":    commands.NewCmdRoll(),
+        "sensors": commands.NewCmdSensorsLast(),
     }
     
     // Append some basic commands to the config so it'll be registered always.

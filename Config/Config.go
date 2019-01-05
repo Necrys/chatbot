@@ -28,6 +28,14 @@ type CfgHistory struct {
     Dir     string
 }
 
+type APISettings struct {
+    Port uint16
+}
+
+type HomeMonitorSettings struct {
+    HistorySize int
+}
+
 type Config struct {
     Telegram CfgTelegramSettings
     Slack    CfgSlackSettings
@@ -35,6 +43,8 @@ type Config struct {
     Admins   []CfgAdmin
     Debug    bool
     History  []CfgHistory
+    API      APISettings
+    HomeMon  HomeMonitorSettings
 }
 
 func Read(cfgPath string) (*Config, error) {
