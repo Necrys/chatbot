@@ -17,5 +17,11 @@
         "UserId"   : "user",
         "Password" : "password"
     }],
-    "Debug" : false
+    "Debug" : false,
+    "API": {
+        "Port": 8080
+    },
+    "HomeMon": {
+        "HistorySize": 100
+    }
 }

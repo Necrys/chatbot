@@ -1,11 +1,13 @@
 package cmdprocessor
 
 import "../Config"
+import "bytes"
 import "errors"
 import "strings"
 
 type CommandCtxIf interface {
     Reply(string) ()
+    UploadPNG( *bytes.Buffer ) ()
     Message() (string)
     User() (string)
     UserId() (string)

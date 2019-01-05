@@ -1,6 +1,7 @@
 package slack
 
 import "log"
+import "bytes"
 
 type CommandCtx struct {
     listener  *Listener
@@ -18,6 +19,10 @@ func (this* CommandCtx) Reply(msg string) () {
     }
 
     this.listener.rtm.SendMessage(this.listener.rtm.NewOutgoingMessage(msg, this.channelId))
+}
+
+func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer ) () {
+  // not implemented
 }
 
 func (this* CommandCtx) Message() (string) {

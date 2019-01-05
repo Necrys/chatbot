@@ -36,6 +36,7 @@ func main() {
         "noadmin": commands.NewCmdNoAdmin(botCtx),
         "roll":    commands.NewCmdRoll(),
         "sensors": commands.NewCmdSensorsLast(),
+        "sensorshistory": commands.NewCmdSensorsGraph(),
     }
     
     // Append some basic commands to the config so it'll be registered always.

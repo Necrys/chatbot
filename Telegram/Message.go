@@ -1,6 +1,7 @@
 package telegram
 
 import "github.com/go-telegram-bot-api/telegram-bot-api"
+import "bytes"
 
 type CommandCtx struct {
     listener *Listener
@@ -20,6 +21,13 @@ func (this* CommandCtx) Reply(text string) () {
     msg := tgbotapi.NewMessage(this.cid, text)
     msg.ReplyToMessageID = this.mid
     this.listener.api.Send(msg)
+}
+
+func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer ) () {
+  b := tgbotapi.FileBytes{ Name: "image.jpg", Bytes: buffer.Bytes() }
+  msg := tgbotapi.NewPhotoUpload(this.cid, b)
+  msg.ReplyToMessageID = this.mid
+  this.listener.api.Send(msg)
 }
 
 func (this* CommandCtx) User() (string) {

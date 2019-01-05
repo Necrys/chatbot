@@ -18,7 +18,8 @@ func ( this* CmdSensorsLast ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf ) 
     return true
   }
 
-  val := api.SensorsHistory.Value
+  // Prev() because we need to compensate Next() call in data appending procedure
+  val := api.SensorsHistory.Prev().Value
   if val == nil {
     cmdCtx.Reply( "No data" )
     return true
