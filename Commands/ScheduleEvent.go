@@ -36,38 +36,40 @@ func ( this* ScheduleEvent ) HandleCommand( cmd cmdprocessor.CommandCtxIf ) ( bo
 
   channel = tokens[ 0 ]
 
-  layouts := []string{ "02.01.2006T15:04:05",
-                       "15:04:05" }
+  layout := "02.01.2006T15:04:05"
 
-  timeParsed := false
-  for i, layout := range layouts {
-    var err error
-    timePoint, err = time.Parse( layout, tokens[ 1 ] )
-    if err == nil {
-      timeParsed = true
-      
-      // second layout without date was used, set local date
-      if i == 1 {
-        t := time.Now()
-
-        loc, err := time.LoadLocation( "UTC" )
-        if err != nil {
-          log.Panic( err )
-          cmd.Reply( fmt.Sprintf( "LoadLocation UTC failed: %+v", err ) )
-          return true
-        }
-
-        timePoint = time.Date( t.Year(), t.Month(), t.Day(), timePoint.Hour(), timePoint.Minute(), timePoint.Second(), 0, loc )
-      }
-      
-      break
+  // absolute value is intended as set by user in his local timezone
+  // but it's parsed as UTC so we'll get the difference between UTC and user local TZ to fix the value
+  userLocation, err := this.botCtx.UserLocDb.GetUserLocation( cmd.User() )
+  if err != nil {
+    // assume user is in bot's location
+    userLocation, err = time.LoadLocation( "Local" )
+    if err != nil {
+      log.Panic( err )
+      cmd.Reply( fmt.Sprintf( "Failed: %+v", err ) )
+      return true
     }
   }
 
-  if timeParsed != true {
-    cmd.Reply( "Bad time format" )
-    return true
+  localCurrentTime := time.Now()
+  userCurrentTime := localCurrentTime.In( userLocation )
+
+  timePoint, err = time.Parse( layout, tokens[ 1 ] )
+
+  if err != nil {
+    userEnteredTimeAffix := userCurrentTime.Format( "02.01.2006T" )
+    userEnteredTime := userEnteredTimeAffix + tokens[ 1 ]
+
+    timePoint, err = time.Parse( layout, userEnteredTime )
+    if err != nil {
+      fmt.Println( "Failed to parse userTime: ", err )
+      cmd.Reply( "Bad time format" )
+      return true
+    }
   }
+
+  _, offset := userCurrentTime.Zone()
+  timePoint = timePoint.Add( time.Duration( -offset ) * time.Second )
 
   // check for period
   restTokens := strings.SplitN( tokens[ 2 ], " ", 3 )
@@ -99,9 +101,6 @@ func ( this* ScheduleEvent ) HandleCommand( cmd cmdprocessor.CommandCtxIf ) ( bo
     log.Printf( "ScheduleEvent: { channel: \"%+v\", cmdLine: \"%+v\", timePoint: %+v, isPeriodic: %+v, period: %+v }",
       channel, cmdLine, timePoint, isPeriodic, period )
   }
-
-  _, tzOffset := time.Now().Zone()
-  timePoint = timePoint.Add( time.Second * time.Duration( -tzOffset ) )
 
   id, err := this.botCtx.ScheduleEvent( channel, cmdLine, timePoint, isPeriodic, period )
   if err != nil {
