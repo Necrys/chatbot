@@ -68,6 +68,7 @@ func main() {
         "schedule": commands.NewScheduleEvent( botCtx ),
         "deleteevent": commands.NewDeleteEvent( botCtx ),
         "getevents": commands.NewGetActiveEvents(),
+        "setlocation": commands.NewSetLocation( botCtx ),
     }
     
     // Append some basic commands to the config so it'll be registered always.
