@@ -13,6 +13,7 @@ import "bytes"
 import "time"
 import "fmt"
 import "strings"
+import "strconv"
 
 type CmdId int
 
@@ -29,6 +30,7 @@ type Listener struct {
     control chan ListenerCmd
     bot     *bot.Context
     logger  *history.ServiceLogger
+    handler *cmdprocessor.CmdRegistry
 }
 
 func NewListener(cfg *config.Config, botCtx *bot.Context, logger *history.Logger) (*Listener, error) {
@@ -123,6 +125,7 @@ func dumpUpdate(upd *tgbotapi.Update) () {
         dumpChat(upd.Message.Chat, 1, "Chat")
         dumpUser(upd.Message.ForwardFrom, 1, "ForwardFrom")
         dumpChat(upd.Message.ForwardFromChat, 1, "ForwardFromChat")
+        log.Printf("  Text", upd.Message.Text)
         log.Printf("  ForwardFromMessageID", upd.Message.ForwardFromMessageID)
         log.Printf("  ForwardDate", upd.Message.ForwardDate)
         log.Printf("  ReplyToMessage")
@@ -173,6 +176,13 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
             }
 
             this.logChatMessage(&update)
+            var chatName string
+            if len( update.Message.Chat.Title ) == 0 {
+              chatName = update.Message.From.UserName
+            } else {
+              chatName = update.Message.Chat.Title
+            }
+            this.bot.ChatsDb.InsertChat( "telegram", chatName, strconv.FormatInt( update.Message.Chat.ID, 16 ) )
 
             cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.api.Self.UserName)
 
@@ -198,9 +208,30 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
 }
 
 func (this* Listener) Start(cmdHandler *cmdprocessor.CmdRegistry) () {
+    this.handler = cmdHandler
     go this.listen(cmdHandler)
 }
 
 func (this* Listener) Stop() () {
     this.control <- ListenerCmd { id: CmdStop }
+}
+
+func ( this* Listener ) PushMessage( channelId string, cmdLine string ) () {
+  cmd, args := cmdprocessor.SplitCommandAndArgs( cmdLine, this.api.Self.UserName )
+
+  iChanId, err := strconv.ParseInt( channelId, 16, 64 )
+  if err != nil {
+    log.Printf( "telegram.PushMessage: can't parse channel Id" )
+    return
+  }
+  
+  cmdCtx := &CommandCtx { listener: this,
+                          user:     "",
+                          msg:      cmdLine,
+                          mid:      0,
+                          cid:      iChanId,
+                          command:  cmd,
+                          args:     args }
+
+  this.handler.HandleCommand( cmdCtx )
 }

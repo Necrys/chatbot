@@ -9,6 +9,10 @@ import "./Slack"
 import "./HistoryLogger"
 import "./Api"
 import "log"
+import "time"
+import "os"
+import "os/signal"
+import "syscall"
 
 func main() {
     log.Print("----- Start -----")
@@ -26,6 +30,28 @@ func main() {
         return
     }
 
+    sigs := make( chan os.Signal, 1 )
+    signal.Notify( sigs, syscall.SIGINT, syscall.SIGTERM )
+
+    go func() {
+      sig := <-sigs
+      log.Println()
+      log.Println( sig )
+      botCtx.Waiting <- false 
+    } ()
+
+    // periodically save dbs to disk
+    ticker := time.NewTicker( 3 * time.Hour )
+    go func() {
+      for {
+        <-ticker.C
+        botCtx.ChatsDb.SaveToFile()
+        botCtx.SaveScheduleDBToFile()
+      }
+    }()
+
+    defer botCtx.ChatsDb.SaveToFile()
+
     // run HTTP API handler
     api.RunAPIHandler( cfg )
     
@@ -37,6 +63,11 @@ func main() {
         "roll":    commands.NewCmdRoll(),
         "sensors": commands.NewCmdSensorsLast(),
         "sensorshistory": commands.NewCmdSensorsGraph(),
+        "getchats": commands.NewGetKnownChats( botCtx ),
+        "say": commands.NewSay( botCtx ),
+        "schedule": commands.NewScheduleEvent( botCtx ),
+        "deleteevent": commands.NewDeleteEvent( botCtx ),
+        "getevents": commands.NewGetActiveEvents(),
     }
     
     // Append some basic commands to the config so it'll be registered always.
@@ -45,7 +76,7 @@ func main() {
     cfg.Commands = append(cfg.Commands, "goadmin")
     cfg.Commands = append(cfg.Commands, "noadmin")
     
-    cmdHandler, err := cmdprocessor.NewCmdRegistry(cfg, cmds)
+    botCtx.CmdProc, err = cmdprocessor.NewCmdRegistry(cfg, cmds)
     if err != nil {
         log.Print("Failed to create command registry")
         return
@@ -63,7 +94,8 @@ func main() {
             log.Print("Failed to init telegram listener: ", err)
             return
         } else {
-            tgListener.Start(cmdHandler)
+            tgListener.Start( botCtx.CmdProc )
+            bot.AddListener( "telegram", tgListener )
         }
     }
 
@@ -74,11 +106,17 @@ func main() {
             log.Print("Failed to init slack listener: ", err)
             return
         } else {
-            slackListener.Start(cmdHandler)
+            slackListener.Start( botCtx.CmdProc )
+            bot.AddListener( "slack", slackListener )
         }
     }
 
-    _ = <- botCtx.Waiting
+    err = botCtx.LoadScheduleDBFromFile()
+    if err != nil {
+      log.Print( err )
+    }
+
+    <- botCtx.Waiting
     log.Print("----- Stop command received -----")
 
     if tgListener != nil {
@@ -88,6 +126,8 @@ func main() {
     if slackListener != nil {
         slackListener.Stop()
     }
+    
+    ticker.Stop()
 
     log.Print("----- Stop -----")
 }

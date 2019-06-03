@@ -105,3 +105,7 @@ func (this *Listener) Start(cmdHandler *cmdprocessor.CmdRegistry) () {
 func (this *Listener) Stop() () {
     this.control <- ListenerCmd { id: CmdStop }
 }
+
+func ( this* Listener ) PushMessage( cid string, cmdLine string ) () {
+  
+}

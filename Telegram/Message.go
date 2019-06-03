@@ -1,7 +1,10 @@
 package telegram
 
-import "github.com/go-telegram-bot-api/telegram-bot-api"
-import "bytes"
+import (
+  "github.com/go-telegram-bot-api/telegram-bot-api"
+  "bytes"
+  "strconv"
+)
 
 type CommandCtx struct {
     listener *Listener
@@ -17,10 +20,26 @@ func (this* CommandCtx) Message() (string) {
     return this.msg
 }
 
-func (this* CommandCtx) Reply(text string) () {
-    msg := tgbotapi.NewMessage(this.cid, text)
+func (this* CommandCtx) SayToChat( text string, cid string ) () {
+  this.ReplyTo( text, cid, false )
+}
+
+func (this* CommandCtx) Reply( text string ) () {
+  this.ReplyTo( text, strconv.FormatInt( this.cid, 16 ), true )
+}
+
+func (this* CommandCtx) ReplyTo( text string, cid string, useCitation bool ) () {
+  channelId, err := strconv.ParseInt( cid, 16, 64 )
+  if err != nil {
+    return
+  }
+
+  msg := tgbotapi.NewMessage( channelId, text )
+  if this.mid != 0 && useCitation == true {
     msg.ReplyToMessageID = this.mid
-    this.listener.api.Send(msg)
+  }
+  msg.ParseMode = tgbotapi.ModeMarkdown
+  this.listener.api.Send(msg)
 }
 
 func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer ) () {

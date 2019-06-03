@@ -6,7 +6,9 @@ import "errors"
 import "strings"
 
 type CommandCtxIf interface {
+    SayToChat( string, string ) ()
     Reply(string) ()
+    ReplyTo(string, string, bool) ()
     UploadPNG( *bytes.Buffer ) ()
     Message() (string)
     User() (string)
@@ -67,7 +69,7 @@ func SplitCommandAndArgs(message string, botName string) (string, string) {
     // if not, command will be ignored
     if strings.Contains(tokens[0], "@") == true {
         cmd := strings.Split(tokens[0], "@")
-        if cmd[1] == botName {
+        if cmd[1] == strings.ToLower( botName ) {
             tokens[0] = cmd[0]
         } else {
             tokens[0] = ""
@@ -81,4 +83,9 @@ func SplitCommandAndArgs(message string, botName string) (string, string) {
     tokens[1] = strings.Trim(tokens[1], " \n\t")
 
     return tokens[0], tokens[1]
+}
+
+func ( this *CmdRegistry ) IsCommand( name string ) ( bool ) {
+  _, ok := this.commands[ name ]
+  return ok
 }

@@ -13,12 +13,20 @@ type CommandCtx struct {
     channelId string
 }
 
-func (this* CommandCtx) Reply(msg string) () {
-    if this.listener.bot.Debug == true {
-        log.Printf("reply to %v: %v", this.channelId, msg)
-    }
+func ( this* CommandCtx ) SayToChat( text string, cid string ) () {
+  this.ReplyTo( text, cid, false )
+}
 
-    this.listener.rtm.SendMessage(this.listener.rtm.NewOutgoingMessage(msg, this.channelId))
+func ( this* CommandCtx ) Reply( msg string ) () {
+  this.ReplyTo( msg, this.channelId, true )
+}
+
+func ( this* CommandCtx ) ReplyTo( text string, cid string, useCitation bool ) () {
+  if this.listener.bot.Debug == true {
+    log.Printf( "reply to %v: %v", cid, text )
+  }
+
+  this.listener.rtm.SendMessage( this.listener.rtm.NewOutgoingMessage( text, cid ) )
 }
 
 func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer ) () {
