@@ -20,6 +20,12 @@ func NewScheduleEvent( ctx *bot.Context ) ( *ScheduleEvent ) {
 }
 
 func ( this* ScheduleEvent ) HandleCommand( cmd cmdprocessor.CommandCtxIf ) ( bool ) {
+  isadmin := this.botCtx.IsAdmin( cmd.UserId() )
+  if isadmin == false {
+    cmd.Reply( "You're not The Master" )
+    return true
+  }
+
   args := strings.Trim( cmd.Args(), " \n\t" )
 
   var channel string

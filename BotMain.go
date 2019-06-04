@@ -67,7 +67,7 @@ func main() {
         "say": commands.NewSay( botCtx ),
         "schedule": commands.NewScheduleEvent( botCtx ),
         "deleteevent": commands.NewDeleteEvent( botCtx ),
-        "getevents": commands.NewGetActiveEvents(),
+        "getevents": commands.NewGetActiveEvents( botCtx ),
         "setlocation": commands.NewSetLocation( botCtx ),
     }
     

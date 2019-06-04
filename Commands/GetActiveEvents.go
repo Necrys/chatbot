@@ -8,14 +8,21 @@ import (
 )
 
 type GetActiveEvents struct {
+  botCtx *bot.Context
 }
 
-func NewGetActiveEvents() ( *GetActiveEvents ) {
-  this := &GetActiveEvents {}
+func NewGetActiveEvents( ctx *bot.Context ) ( *GetActiveEvents ) {
+  this := &GetActiveEvents { botCtx : ctx }
   return this
 }
 
 func ( this* GetActiveEvents ) HandleCommand( cmd cmdprocessor.CommandCtxIf ) ( bool ) {
+  isadmin := this.botCtx.IsAdmin( cmd.UserId() )
+  if isadmin == false {
+    cmd.Reply( "You're not The Master" )
+    return true
+  }
+
   eventsMap := bot.GetActiveEvents()
   var str strings.Builder
   for _, e := range eventsMap {

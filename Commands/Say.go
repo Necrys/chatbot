@@ -16,6 +16,12 @@ func NewSay( ctx *bot.Context ) ( *Say ) {
 }
 
 func ( this* Say ) HandleCommand( cmd cmdprocessor.CommandCtxIf ) ( bool ) {
+  isadmin := this.botCtx.IsAdmin( cmd.UserId() )
+  if isadmin == false {
+    cmd.Reply( "You're not The Master" )
+    return true
+  }
+
   args := strings.Trim( cmd.Args(), " \n\t" )
   cmdLine := strings.SplitN( args, " ", 2 )
   if len( cmdLine ) == 0 {
