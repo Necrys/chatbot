@@ -226,7 +226,7 @@ func ( this* Listener ) PushMessage( channelId string, cmdLine string ) () {
   }
   
   cmdCtx := &CommandCtx { listener: this,
-                          user:     "",
+                          user:     "__thisbot__",
                           msg:      cmdLine,
                           mid:      0,
                           cid:      iChanId,
