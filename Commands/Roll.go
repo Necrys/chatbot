@@ -21,7 +21,7 @@ func (this* CmdRoll) HandleCommand(cmdCtx cmdprocessor.CommandCtxIf) (bool) {
         tokens[i] = strings.Trim(tokens[i], " \n\t")
     }
 
-    cmdCtx.Reply(fmt.Sprintf("result: %s", tokens[this.rng.Intn(len(tokens))]))
+    cmdCtx.Reply(fmt.Sprintf("%s", tokens[this.rng.Intn(len(tokens))]))
 
     return true
 }
