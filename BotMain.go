@@ -58,6 +58,7 @@ func main() {
     // Create and registrate commands
     cmds := map[string]cmdprocessor.CommandProcIf {
         "stop":    commands.NewCmdStop(botCtx),
+        "restart": commands.NewCmdRestart(botCtx),
         "goadmin": commands.NewCmdGoAdmin(cfg, botCtx),
         "noadmin": commands.NewCmdNoAdmin(botCtx),
         "roll":    commands.NewCmdRoll(),
@@ -75,6 +76,7 @@ func main() {
     // Append some basic commands to the config so it'll be registered always.
     // Not a good solution but will work at this point
     cfg.Commands = append(cfg.Commands, "stop")
+    cfg.Commands = append(cfg.Commands, "restart")
     cfg.Commands = append(cfg.Commands, "goadmin")
     cfg.Commands = append(cfg.Commands, "noadmin")
     
