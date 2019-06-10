@@ -1,21 +1,32 @@
 package main
 
-import "./Bot"
-import "./Config"
-import "./CmdProcessor"
-import "./Commands"
-import "./Telegram"
-import "./Slack"
-import "./HistoryLogger"
-import "./Api"
-import "log"
-import "time"
-import "os"
-import "os/signal"
-import "syscall"
+import (
+  "./Bot"
+  "./Config"
+  "./CmdProcessor"
+  "./Commands"
+  "./Telegram"
+  "./Slack"
+  "./HistoryLogger"
+  "./Api"
+  "log"
+  "time"
+  "os"
+  "os/signal"
+  "syscall"
+  "fmt"
+)
+
+var (
+	Version   = "undefined"
+  Commit    = "undefined"
+	BuildTime = "undefined"
+	GitHash   = "undefined"
+)
 
 func main() {
     log.Print("----- Start -----")
+    log.Print( fmt.Sprintf( "----- Version: %v.%v ( %v, %v ) -----", Version, Commit, GitHash, BuildTime ) )
 
     log.Print("----- Load config -----")
     cfg, err := config.Read("config.json")
@@ -54,7 +65,7 @@ func main() {
 
     // run HTTP API handler
     api.RunAPIHandler( cfg )
-    
+
     // Create and registrate commands
     cmds := map[string]cmdprocessor.CommandProcIf {
         "stop":    commands.NewCmdStop(botCtx),
@@ -72,14 +83,14 @@ func main() {
         "setlocation": commands.NewSetLocation( botCtx ),
         "calend": commands.NewCalend( cfg ),
     }
-    
+
     // Append some basic commands to the config so it'll be registered always.
     // Not a good solution but will work at this point
     cfg.Commands = append(cfg.Commands, "stop")
     cfg.Commands = append(cfg.Commands, "restart")
     cfg.Commands = append(cfg.Commands, "goadmin")
     cfg.Commands = append(cfg.Commands, "noadmin")
-    
+
     botCtx.CmdProc, err = cmdprocessor.NewCmdRegistry(cfg, cmds)
     if err != nil {
         log.Print("Failed to create command registry")
@@ -130,7 +141,7 @@ func main() {
     if slackListener != nil {
         slackListener.Stop()
     }
-    
+
     ticker.Stop()
 
     log.Print("----- Stop -----")
