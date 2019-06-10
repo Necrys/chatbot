@@ -105,3 +105,13 @@ func ( this *KnownChatsDB ) GetChatService( id string ) ( string, error ) {
 
   return "", errors.New( "No chat found" )
 }
+
+func ( this *KnownChatsDB ) GetChatAndServiceByName( name string ) ( string, string, error ) {
+  for svc, chats := range this.ServiceToChatsListMap {
+    if chat, ok := chats[ name ]; ok {
+      return chat, svc, nil
+    }
+  }
+
+  return "", "", errors.New( "No chat found" )
+}

@@ -131,6 +131,13 @@ func main() {
       log.Print( err )
     }
 
+    helloUsers := []string{}
+    for _, v := range cfg.Admins {
+      helloUsers = append( helloUsers, v.UserId )
+    }
+
+    botCtx.SayHello( fmt.Sprintf( "Bot, version %s.%s ( %s, %s ) started", Version, Commit, GitHash, BuildTime ), helloUsers )
+
     <- botCtx.Waiting
     log.Print("----- Stop command received -----")
 

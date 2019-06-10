@@ -3,6 +3,8 @@ package bot
 import (
   "../Config"
   "../CmdProcessor"
+  "log"
+  "fmt"
 )
 
 type Context struct {
@@ -37,4 +39,19 @@ func (this* Context) IsAdmin(UserId string) (bool) {
     }
 
     return flag
+}
+
+func ( this* Context ) SayHello( s string, users []string ) () {
+  for _, v := range users {
+    ch, svc, err := this.ChatsDb.GetChatAndServiceByName( v )
+    if err == nil {
+      l, err := GetListener( svc )
+      if err != nil {
+        log.Panic( fmt.Sprintf( "%v", err ) )
+        continue
+      }
+
+      l.PushMessage( ch, fmt.Sprintf( "say %s %s", ch, s ) )
+    }
+  }
 }
