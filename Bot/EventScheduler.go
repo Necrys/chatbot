@@ -28,26 +28,28 @@ const SchedulerDBFileName = "scheduler_db.json"
 
 func ( this *Context ) scheduleNextTimedEvent( e ScheduledEvent ) {
   time.AfterFunc( e.PeriodSeconds, func() {
-    if schedulerDB[ e.Id ].deleted {
-      delete( schedulerDB, e.Id )
-      this.SaveScheduleDBToFile()
-      schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
+    if _, ok := schedulerDB[ e.Id ]; ok {
+      if schedulerDB[ e.Id ].deleted {
+        delete( schedulerDB, e.Id )
+        this.SaveScheduleDBToFile()
+        schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
 
-      return
-    }
+        return
+      }
 
-    e.listener.PushMessage( e.TargetChannel, e.CommandString )
-    if e.IsPeriodic {
-      eventData := schedulerDB[ e.Id ]
-      eventData.TimePoint = eventData.TimePoint.Add( eventData.PeriodSeconds )
-      schedulerDB[ e.Id ] = eventData
-      this.SaveScheduleDBToFile()
-      this.scheduleNextTimedEvent( e )
-    } else {
-      // seems like a dead code
-      delete( schedulerDB, e.Id )
-      this.SaveScheduleDBToFile()
-      schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
+      e.listener.PushMessage( e.TargetChannel, e.CommandString )
+      if e.IsPeriodic {
+        eventData := schedulerDB[ e.Id ]
+        eventData.TimePoint = eventData.TimePoint.Add( eventData.PeriodSeconds )
+        schedulerDB[ e.Id ] = eventData
+        this.SaveScheduleDBToFile()
+        this.scheduleNextTimedEvent( e )
+      } else {
+        // seems like a dead code
+        delete( schedulerDB, e.Id )
+        this.SaveScheduleDBToFile()
+        schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
+      }
     }
   } )
 }
@@ -55,25 +57,27 @@ func ( this *Context ) scheduleNextTimedEvent( e ScheduledEvent ) {
 func ( this *Context ) scheduleEvent( e ScheduledEvent ) {
   dur := e.TimePoint.Sub( time.Now() )
   time.AfterFunc( dur, func() {
-    if schedulerDB[ e.Id ].deleted {
-      delete( schedulerDB, e.Id )
-      this.SaveScheduleDBToFile()
-      schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
+    if _, ok := schedulerDB[ e.Id ]; ok {
+      if schedulerDB[ e.Id ].deleted {
+        delete( schedulerDB, e.Id )
+        this.SaveScheduleDBToFile()
+        schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
 
-      return
-    }
+        return
+      }
 
-    e.listener.PushMessage( e.TargetChannel, e.CommandString )
-    if e.IsPeriodic {
-      eventData := schedulerDB[ e.Id ]
-      eventData.TimePoint = eventData.TimePoint.Add( eventData.PeriodSeconds )
-      schedulerDB[ e.Id ] = eventData
-      this.SaveScheduleDBToFile()
-      this.scheduleNextTimedEvent( e )
-    } else {
-      delete( schedulerDB, e.Id )
-      this.SaveScheduleDBToFile()
-      schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
+      e.listener.PushMessage( e.TargetChannel, e.CommandString )
+      if e.IsPeriodic {
+        eventData := schedulerDB[ e.Id ]
+        eventData.TimePoint = eventData.TimePoint.Add( eventData.PeriodSeconds )
+        schedulerDB[ e.Id ] = eventData
+        this.SaveScheduleDBToFile()
+        this.scheduleNextTimedEvent( e )
+      } else {
+        delete( schedulerDB, e.Id )
+        this.SaveScheduleDBToFile()
+        schedulerFreeEventIds = append( schedulerFreeEventIds, e.Id )
+      }
     }
   } )
 }
@@ -126,9 +130,12 @@ func ( this* Context ) ScheduleEvent( cid string, cmdLine string, inTimePoint ti
 }
 
 func ( this* Context ) DeleteEvent( id uint64 ) {
+  Debug( "[DeleteEvent( %v )]", id )
+
   if e, ok := schedulerDB[ id ]; ok {
     e.deleted = true
     schedulerDB[ id ] = e
+    Debug( "[DeleteEvent] Event %v marked as deleted", id )
   }
 }
 
@@ -175,6 +182,7 @@ func ( this* Context ) SaveScheduleDBToFile() ( error ) {
 
   for _, id := range deletedEvents {
     delete( schedulerDB, id )
+    schedulerFreeEventIds = append( schedulerFreeEventIds, id )
   }
 
   // write json
