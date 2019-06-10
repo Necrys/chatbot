@@ -37,14 +37,15 @@ type HomeMonitorSettings struct {
 }
 
 type Config struct {
-    Telegram CfgTelegramSettings
-    Slack    CfgSlackSettings
-    Commands []string
-    Admins   []CfgAdmin
-    Debug    bool
-    History  []CfgHistory
-    API      APISettings
-    HomeMon  HomeMonitorSettings
+    Telegram  CfgTelegramSettings
+    Slack     CfgSlackSettings
+    Commands  []string
+    Admins    []CfgAdmin
+    Debug     bool
+    History   []CfgHistory
+    API       APISettings
+    HomeMon   HomeMonitorSettings
+    CalendUrl string
 }
 
 func Read(cfgPath string) (*Config, error) {
