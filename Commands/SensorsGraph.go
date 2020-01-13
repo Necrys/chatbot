@@ -162,8 +162,8 @@ func drawSingleGraph ( timeAxis []time.Time, dataAxis []float64, dataUnits strin
 		},
 		XAxis: chart.XAxis {
 			Name:         "Time",
-			NameStyle:    chart.StyleShow(),
-			Style:        chart.StyleShow(),
+			NameStyle:    chart.Shown(),
+			Style:        chart.Shown(),
 			ValueFormatter: func( v interface{} ) string {
 				typed := v.( float64 )
         return time.Unix(0, int64(typed)).Format("01-02 15:04")
@@ -171,14 +171,14 @@ func drawSingleGraph ( timeAxis []time.Time, dataAxis []float64, dataUnits strin
 		},
 		YAxis: chart.YAxis{
 			Name:      dataUnits,
-			NameStyle: chart.StyleShow(),
-			Style:     chart.StyleShow(), //enables / displays the y-axis
+			NameStyle: chart.Shown(),
+			Style:     chart.Shown(), //enables / displays the y-axis
 		},
 		Series: []chart.Series{
 			chart.TimeSeries {
         Name:    dataName,
 				Style:   chart.Style{
-					Show:        true,                             //note; if we set ANY other properties, we must set this to true.
+					Hidden:      false,                             //note; if we set ANY other properties, we must set this to true.
 					StrokeColor: drawing.ColorFromHex("BFFFA4"),               // will supercede defaults
 					FillColor:   drawing.ColorFromHex("2B9100").WithAlpha(128), // will supercede defaults
 				},
@@ -206,8 +206,8 @@ func drawDoubleGraph ( timeAxis []time.Time, dataAxis []float64, dataUnits strin
 		},
 		XAxis: chart.XAxis {
 			Name:         "Time",
-			NameStyle:    chart.StyleShow(),
-			Style:        chart.StyleShow(),
+			NameStyle:    chart.Shown(),
+			Style:        chart.Shown(),
 			ValueFormatter: func( v interface{} ) string {
 				typed := v.( float64 )
         return time.Unix(0, int64(typed)).Format("01-02 15:04")
@@ -215,19 +215,19 @@ func drawDoubleGraph ( timeAxis []time.Time, dataAxis []float64, dataUnits strin
 		},
 		YAxis: chart.YAxis{
 			Name:      dataUnits,
-			NameStyle: chart.StyleShow(),
-			Style:     chart.StyleShow(), //enables / displays the y-axis
+			NameStyle: chart.Shown(),
+			Style:     chart.Shown(), //enables / displays the y-axis
 		},
 		YAxisSecondary: chart.YAxis{
 			Name:      secondaryDataUnits,
-			NameStyle: chart.StyleShow(),
-			Style:     chart.StyleShow(), //enables / displays the secondary y-axis
+			NameStyle: chart.Shown(),
+			Style:     chart.Shown(), //enables / displays the secondary y-axis
 		},
 		Series: []chart.Series{
 			chart.TimeSeries {
         Name:    dataName,
 				Style:   chart.Style {
-					Show:        true,                             //note; if we set ANY other properties, we must set this to true.
+					Hidden:      false,                             //note; if we set ANY other properties, we must set this to true.
 					StrokeColor: drawing.ColorFromHex("BFFFA4"),               // will supercede defaults
 					FillColor:   drawing.ColorFromHex("2B9100").WithAlpha(128), // will supercede defaults
 				},
@@ -237,7 +237,7 @@ func drawDoubleGraph ( timeAxis []time.Time, dataAxis []float64, dataUnits strin
 			chart.TimeSeries {
         Name:    secondaryDataName,
 				Style:   chart.Style{
-					Show:        true,                            //note; if we set ANY other properties, we must set this to true.
+					Hidden:      false,                            //note; if we set ANY other properties, we must set this to true.
 					StrokeColor: drawing.ColorFromHex("A8E3FF"),               // will supercede defaults
 					FillColor:   drawing.ColorFromHex("04476B").WithAlpha(128), // will supercede defaults
 				},
