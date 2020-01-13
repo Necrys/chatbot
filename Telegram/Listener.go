@@ -118,7 +118,7 @@ func (this* Listener) listen(cmdHandler *cmdprocessor.CmdRegistry) () {
             }
             this.bot.ChatsDb.InsertChat( "telegram", chatName, strconv.FormatInt( update.Message.Chat.ID, 16 ) )
 
-            cmd, args := cmdprocessor.SplitCommandAndArgs(update.Message.Text, this.api.Self.UserName)
+            cmd, args := cmdHandler.SplitCommandAndArgs(update.Message.Text, this.api.Self.UserName)
 
             cmdCtx := &CommandCtx { listener: this,
                                     user:     update.Message.From.UserName,
@@ -151,7 +151,7 @@ func (this* Listener) Stop() () {
 }
 
 func ( this* Listener ) PushMessage( channelId string, cmdLine string ) () {
-  cmd, args := cmdprocessor.SplitCommandAndArgs( cmdLine, this.api.Self.UserName )
+  cmd, args := this.handler.SplitCommandAndArgs( cmdLine, this.api.Self.UserName )
 
   iChanId, err := strconv.ParseInt( channelId, 16, 64 )
   if err != nil {

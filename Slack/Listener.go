@@ -50,7 +50,7 @@ func (this *Listener) processEvent(event *slack.RTMEvent, cmdHandler *cmdprocess
             log.Printf("message event: \"%v\", from: \"%v\"", ev.Text, ev.User)
         }
 
-        cmd, args := cmdprocessor.SplitCommandAndArgs(ev.Text, ev.User)
+        cmd, args := cmdHandler.SplitCommandAndArgs(ev.Text, ev.User)
         cmdCtx := &CommandCtx { listener:  this,
                                 message:   ev.Text,
                                 command:   cmd,

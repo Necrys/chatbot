@@ -23,6 +23,7 @@ type CommandProcIf interface {
 
 type CmdRegistry struct {
     commands map[string]CommandProcIf
+    aliases  map[string]string
 }
 
 func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*CmdRegistry, error) {
@@ -30,7 +31,8 @@ func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*Cmd
         return nil, errors.New("No command processors passed")
     }
 
-    this := &CmdRegistry{ make(map[string]CommandProcIf) }
+    this := &CmdRegistry{ make(map[string]CommandProcIf),
+                          make(map[string]string) }
 
     for _, v := range cfg.Commands {
         cmd, ok := commands[v]
@@ -38,6 +40,10 @@ func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*Cmd
             this.commands[v] = cmd
             delete(commands, v)
         }
+    }
+
+    for k,v := range cfg.CommandAliases {
+        this.aliases[ k ] = v
     }
 
     return this, nil
@@ -54,9 +60,18 @@ func (this *CmdRegistry) HandleCommand(cmd CommandCtxIf) (bool) {
     return true
 }
 
+func (this *CmdRegistry) checkAlias(message string) (string) {
+    if alias, ok := this.aliases[ message ]; ok {
+        return alias
+    }
+
+    return message
+}
+
 // split first token and the rest of the message
 // convert first token to lower case
-func SplitCommandAndArgs(message string, botName string) (string, string) {
+func (this *CmdRegistry) SplitCommandAndArgs(msg string, botName string) (string, string) {
+    message := this.checkAlias( msg )
     tokens := strings.SplitN(strings.Trim(message, " \n\t"), " ", 2)
 
     if len(tokens) == 0 {
