@@ -9,7 +9,6 @@ import "golang.org/x/net/proxy"
 import "errors"
 import "net/http"
 import "log"
-import "bytes"
 import "time"
 import "fmt"
 import "strings"
@@ -66,71 +65,6 @@ func NewListener(cfg *config.Config, botCtx *bot.Context, logger *history.Logger
     }
 
     return this, nil
-}
-
-func makeIndentString(level int) (string) {
-    var indent bytes.Buffer
-    for i := 0; i < level; i++ {
-        indent.WriteString("  ")
-    }
-
-    return indent.String()
-}
-
-func dumpUser(user *tgbotapi.User, indentLevel int, name string) () {
-    if user == nil {
-        return
-    }
-
-    indent := makeIndentString(indentLevel)
-
-    log.Printf("%v%v {", indent, name)
-    log.Printf("%v  ID: %v",           indent, user.ID)
-    log.Printf("%v  FirstName: %v",    indent, user.FirstName)
-    log.Printf("%v  LastName: %v",     indent, user.LastName)
-    log.Printf("%v  UserName: %v",     indent, user.UserName)
-    log.Printf("%v  LanguageCode: %v", indent, user.LanguageCode)
-    log.Printf("%v  IsBot: %v",        indent, user.IsBot)
-    log.Printf("%v}", indent)
-}
-
-func dumpChat(chat *tgbotapi.Chat, indentLevel int, name string) () {
-    if chat == nil {
-        return
-    }
-
-    indent := makeIndentString(indentLevel)
-
-    log.Printf("%v%v {", indent, name)
-    log.Printf("%v  ID: %v",                  indent, chat.ID)
-    log.Printf("%v  Type: %v",                indent, chat.Type)
-    log.Printf("%v  Title: %v",               indent, chat.Title)
-    log.Printf("%v  UserName: %v",            indent, chat.UserName)
-    log.Printf("%v  FirstName: %v",           indent, chat.FirstName)
-    log.Printf("%v  LastName: %v",            indent, chat.LastName)
-    log.Printf("%v  AllMembersAreAdmins: %v", indent, chat.AllMembersAreAdmins)
-    log.Printf("%v  Photo: %v",               indent, chat.Photo)
-    log.Printf("%v  Description: %v",         indent, chat.Description)
-    log.Printf("%v  InviteLink: %v",          indent, chat.InviteLink)
-    log.Printf("%v}", indent)
-}
-
-func dumpUpdate(upd *tgbotapi.Update) () {
-    log.Printf("========== New update, id: %v ==========", upd.UpdateID)
-    if upd.Message != nil {
-        log.Printf("Message: {")
-        log.Printf("  MessageID: %v", upd.Message.MessageID)
-        dumpUser(upd.Message.From, 1, "From")
-        log.Printf("  Date: %v", upd.Message.Date)
-        dumpChat(upd.Message.Chat, 1, "Chat")
-        dumpUser(upd.Message.ForwardFrom, 1, "ForwardFrom")
-        dumpChat(upd.Message.ForwardFromChat, 1, "ForwardFromChat")
-        log.Printf("  Text", upd.Message.Text)
-        log.Printf("  ForwardFromMessageID", upd.Message.ForwardFromMessageID)
-        log.Printf("  ForwardDate", upd.Message.ForwardDate)
-        log.Printf("  ReplyToMessage")
-        log.Printf("}")
-    }
 }
 
 func (this* Listener) logChatMessage(upd *tgbotapi.Update) () {
