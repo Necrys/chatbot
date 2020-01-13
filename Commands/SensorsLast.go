@@ -27,7 +27,7 @@ func ( this* CmdSensorsLast ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf ) 
   
   data := val.(api.SensorData)
   cmdCtx.Reply( fmt.Sprintf(
-    "%s\n    temperature: %.2f°C\n    humidity: %.2f%%\n    pressure: %.2f mmHg\n",
+    "%s\n    Температура: %.2f°C\n    Относ.влажность: %.2f%%\n    Атм.давление: %.2f мм р.с.\n",
     data.Timestamp.String(), data.Temperature, data.Humidity, data.Pressure ) )
 
   return true
