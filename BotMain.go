@@ -82,6 +82,7 @@ func main() {
         "getevents": commands.NewGetActiveEvents( botCtx ),
         "setlocation": commands.NewSetLocation( botCtx ),
         "calend": commands.NewCalend( cfg ),
+        "showkeyboard": commands.NewCmdShowKeyboard(),
     }
 
     // Append some basic commands to the config so it'll be registered always.

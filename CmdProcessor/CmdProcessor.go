@@ -15,6 +15,8 @@ type CommandCtxIf interface {
     UserId() (string)
     Command() (string)
     Args() (string)
+    ShowKeyboard( [][]string ) ()
+    HideKeyboard() ()
 }
 
 type CommandProcIf interface {

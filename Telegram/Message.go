@@ -4,6 +4,7 @@ import (
   "github.com/go-telegram-bot-api/telegram-bot-api"
   "bytes"
   "strconv"
+  "fmt"
 )
 
 type CommandCtx struct {
@@ -63,4 +64,32 @@ func (this* CommandCtx) Command() (string) {
 
 func (this* CommandCtx) Args() (string) {
     return this.args
+}
+
+func ( this* CommandCtx ) ShowKeyboard( keyboard [][]string ) () {
+  msg := tgbotapi.NewMessage( this.cid, this.msg )
+
+  kb := tgbotapi.NewReplyKeyboard()
+  for _, row := range keyboard {
+    kbRow := tgbotapi.NewKeyboardButtonRow()
+    for _, key := range row {
+      kbRow = append( kbRow, tgbotapi.NewKeyboardButton( key ) )
+    }
+    kb.Keyboard = append( kb.Keyboard, kbRow )
+  }
+
+  msg.ReplyMarkup = kb
+
+  if _, err := this.listener.api.Send( msg ); err != nil {
+    this.Reply( fmt.Sprintf( "Ошибка: %v", err ) )
+  }
+}
+
+func ( this* CommandCtx ) HideKeyboard() () {
+  msg := tgbotapi.NewMessage( this.cid, this.msg )
+  msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard( true )
+
+  if _, err := this.listener.api.Send( msg ); err != nil {
+    this.Reply( fmt.Sprintf( "Ошибка: %v", err ) )
+  }
 }

@@ -52,3 +52,9 @@ func (this* CommandCtx) Command() (string) {
 func (this* CommandCtx) Args() (string) {
     return this.args
 }
+
+func (this* CommandCtx) ShowKeyboard( [][]string ) () {
+}
+
+func (this* CommandCtx) HideKeyboard() () {
+}
