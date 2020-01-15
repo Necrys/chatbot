@@ -8,6 +8,7 @@ import "strings"
 type CommandCtxIf interface {
     SayToChat( string, string ) ()
     Reply(string) ()
+    ReplyNoCitation(string) ()
     ReplyTo(string, string, bool) ()
     UploadPNG( *bytes.Buffer ) ()
     Message() (string)
@@ -17,6 +18,7 @@ type CommandCtxIf interface {
     Args() (string)
     ShowKeyboard( [][]string ) ()
     HideKeyboard() ()
+    HideUserCommand()
 }
 
 type CommandProcIf interface {

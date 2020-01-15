@@ -63,8 +63,10 @@ func ( this* CmdSensorsGraph ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf )
     dataSrc[1] = None
   }
 
+  cmdCtx.HideUserCommand()
+
   if api.SensorsHistory.Len() == 0 {
-    cmdCtx.Reply( "No data" )
+    cmdCtx.ReplyNoCitation( "No data" )
     return true
   }
 
@@ -139,7 +141,7 @@ func ( this* CmdSensorsGraph ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf )
   buffer := bytes.NewBuffer( []byte{} )
   err := graph.Render( chart.PNG, buffer )
   if err != nil {
-    cmdCtx.Reply( fmt.Sprintf( "Graph rendering error: %v", err ) )
+    cmdCtx.ReplyNoCitation( fmt.Sprintf( "Graph rendering error: %v", err ) )
     return true
   }
 

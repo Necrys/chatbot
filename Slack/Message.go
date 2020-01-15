@@ -21,6 +21,10 @@ func ( this* CommandCtx ) Reply( msg string ) () {
   this.ReplyTo( msg, this.channelId, true )
 }
 
+func ( this* CommandCtx ) ReplyNoCitation( msg string ) () {
+  this.ReplyTo( msg, this.channelId, false )
+}
+
 func ( this* CommandCtx ) ReplyTo( text string, cid string, useCitation bool ) () {
   if this.listener.bot.Debug == true {
     log.Printf( "reply to %v: %v", cid, text )
@@ -57,4 +61,7 @@ func (this* CommandCtx) ShowKeyboard( [][]string ) () {
 }
 
 func (this* CommandCtx) HideKeyboard() () {
+}
+
+func ( this* CommandCtx ) HideUserCommand() {
 }

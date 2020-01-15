@@ -29,6 +29,10 @@ func (this* CommandCtx) Reply( text string ) () {
   this.ReplyTo( text, strconv.FormatInt( this.cid, 16 ), true )
 }
 
+func (this* CommandCtx) ReplyNoCitation( text string ) () {
+  this.ReplyTo( text, strconv.FormatInt( this.cid, 16 ), false )
+}
+
 func (this* CommandCtx) ReplyTo( text string, cid string, useCitation bool ) () {
   channelId, err := strconv.ParseInt( cid, 16, 64 )
   if err != nil {
@@ -92,4 +96,13 @@ func ( this* CommandCtx ) HideKeyboard() () {
   if _, err := this.listener.api.Send( msg ); err != nil {
     this.Reply( fmt.Sprintf( "Ошибка: %v", err ) )
   }
+}
+
+func ( this* CommandCtx ) HideUserCommand() {
+	deleteMessageConfig := tgbotapi.DeleteMessageConfig {
+		ChatID:    this.cid,
+		MessageID: this.mid,
+	}
+
+  this.listener.api.DeleteMessage( deleteMessageConfig )
 }
