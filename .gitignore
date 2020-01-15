@@ -2,3 +2,5 @@ chatbot
 config.json
 chatbot.exe
 log/
+chatbot.pid
+stdout.log
