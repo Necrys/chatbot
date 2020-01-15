@@ -39,7 +39,7 @@ func ( this* Calend ) HandleCommand( c cmdprocessor.CommandCtxIf ) ( bool ) {
 
   buff := bytes.NewBuffer( body )
   
-  c.UploadPNG( buff )
+  c.UploadPNG( buff, false )
 
   return true
 }

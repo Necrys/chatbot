@@ -33,7 +33,7 @@ func ( this* CommandCtx ) ReplyTo( text string, cid string, useCitation bool ) (
   this.listener.rtm.SendMessage( this.listener.rtm.NewOutgoingMessage( text, cid ) )
 }
 
-func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer ) () {
+func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer, useCitation bool ) () {
   // not implemented
 }
 

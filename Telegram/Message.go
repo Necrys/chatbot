@@ -47,10 +47,12 @@ func (this* CommandCtx) ReplyTo( text string, cid string, useCitation bool ) () 
   this.listener.api.Send(msg)
 }
 
-func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer ) () {
+func (this* CommandCtx) UploadPNG( buffer *bytes.Buffer, useCitation bool ) () {
   b := tgbotapi.FileBytes{ Name: "image.jpg", Bytes: buffer.Bytes() }
   msg := tgbotapi.NewPhotoUpload(this.cid, b)
-  msg.ReplyToMessageID = this.mid
+  if this.mid != 0 && useCitation == true {
+    msg.ReplyToMessageID = this.mid
+  }
   this.listener.api.Send(msg)
 }
 

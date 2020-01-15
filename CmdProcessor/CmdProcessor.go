@@ -10,7 +10,7 @@ type CommandCtxIf interface {
     Reply(string) ()
     ReplyNoCitation(string) ()
     ReplyTo(string, string, bool) ()
-    UploadPNG( *bytes.Buffer ) ()
+    UploadPNG( *bytes.Buffer, bool ) ()
     Message() (string)
     User() (string)
     UserId() (string)

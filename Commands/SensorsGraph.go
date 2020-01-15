@@ -145,7 +145,7 @@ func ( this* CmdSensorsGraph ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf )
     return true
   }
 
-  cmdCtx.UploadPNG( buffer )
+  cmdCtx.UploadPNG( buffer, false )
 
   return true
 }
