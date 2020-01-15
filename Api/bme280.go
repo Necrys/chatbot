@@ -74,4 +74,6 @@ func ( this *bme280APIHandler ) ServeHTTP ( w http.ResponseWriter, r *http.Reque
 
   SensorsHistory.Value = data
   SensorsHistory = SensorsHistory.Next()
+
+  this.homeCtrl.UpdateAtmoData( data )
 }
