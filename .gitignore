@@ -4,3 +4,7 @@ chatbot.exe
 log/
 chatbot.pid
 stdout.log
+known_chats_db.json
+known_chats_db.json.bak
+scheduler_db.json
+scheduler_db.json.bak
