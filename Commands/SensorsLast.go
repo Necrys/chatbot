@@ -2,6 +2,7 @@ package commands
 
 import "../CmdProcessor"
 import "../Api"
+import "../Common"
 import "fmt"
 
 type CmdSensorsLast struct {
@@ -25,9 +26,9 @@ func ( this* CmdSensorsLast ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf ) 
     return true
   }
   
-  data := val.(api.SensorData)
+  data := val.(common.SensorData)
   cmdCtx.Reply( fmt.Sprintf(
-    "%s\n    Температура: %.2f°C\n    Относ.влажность: %.2f%%\n    Атм.давление: %.2f мм р.с.\n",
+    "%s\n    🌡 Температура: %.2f°C\n    💧 Относ.влажность: %.2f%%\n    ⏱ Атм.давление: %.2f мм рт.ст.\n",
     data.Timestamp.String(), data.Temperature, data.Humidity, data.Pressure ) )
 
   return true

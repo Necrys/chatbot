@@ -1,5 +1,6 @@
 package config
 
+import "../Common"
 import "encoding/json"
 import "io/ioutil"
 
@@ -33,7 +34,11 @@ type APISettings struct {
 }
 
 type HomeMonitorSettings struct {
-    HistorySize int
+    HistorySize           int
+    TemperatureThresholds common.Span
+    HumidityThresholds    common.Span
+    PressureThresholds    common.Span
+    Subscribers           []string
 }
 
 type Config struct {
@@ -62,4 +67,18 @@ func Read(cfgPath string) (*Config, error) {
     }
 
     return &cfg, nil
+}
+
+func ( this *Config ) Write( cfgPath string ) ( error ) {
+    str, err := json.MarshalIndent( this, "", "  " )
+    if err != nil {
+        return err
+    }
+
+    err = ioutil.WriteFile( cfgPath, str, 0644 )
+    if err != nil {
+        return err
+    }
+
+    return nil
 }

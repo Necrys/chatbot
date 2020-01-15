@@ -14,6 +14,7 @@ type Context struct {
     ChatsDb   *KnownChatsDB
     UserLocDb *UserLocationsDB
     CmdProc   *cmdprocessor.CmdRegistry
+    HomeCtrl  *SmartHomeController
 }
 
 func NewContext(cfg *config.Config) (*Context, error) {
@@ -22,6 +23,8 @@ func NewContext(cfg *config.Config) (*Context, error) {
                     Debug     : cfg.Debug,
                     ChatsDb   : NewKnownChatsDB(),
                     UserLocDb : NewUserLocationsDB() }
+
+  ctx.HomeCtrl = NewSmartHomeController( cfg, ctx )
 
   ctx.ChatsDb.LoadFromFile()
   ctx.UserLocDb.LoadFromFile()

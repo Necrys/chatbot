@@ -3,8 +3,8 @@ package commands
 import (
   "../CmdProcessor"
   "../Api"
+  "../Common"
 	"github.com/wcharczuk/go-chart"
-//	util "github.com/wcharczuk/go-chart/util"
   "bytes"
   "fmt"
   "time"
@@ -79,7 +79,7 @@ func ( this* CmdSensorsGraph ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf )
   
   api.SensorsHistory.Do( func( p interface{} ) {
     if p != nil {
-      data := p.( api.SensorData )
+      data := p.( common.SensorData )
 
       timestampData = append( timestampData, data.Timestamp )
 

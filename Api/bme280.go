@@ -2,6 +2,8 @@ package api
 
 import (
   "../Config"
+  "../Bot"
+  "../Common"
   "container/ring"
   "log"
   "net/http"
@@ -9,27 +11,21 @@ import (
   "time"
 )
 
-type SensorData struct {
-  Timestamp   time.Time
-  Temperature float64
-  Humidity    float64
-  Pressure    float64
-}
-
 type bme280APIHandler struct {
+  homeCtrl *bot.SmartHomeController
 }
 
 var SensorsHistory *ring.Ring
 
-func newBME280APIHandler ( cfg *config.Config ) *bme280APIHandler {
-  handler := &bme280APIHandler {}
+func newBME280APIHandler ( cfg *config.Config, hc *bot.SmartHomeController ) *bme280APIHandler {
+  handler := &bme280APIHandler { homeCtrl : hc }
   SensorsHistory = ring.New( cfg.HomeMon.HistorySize )
   return handler
 }
 
 func ( this *bme280APIHandler ) ServeHTTP ( w http.ResponseWriter, r *http.Request ) {
   // parse arguments
-  data := SensorData{ time.Now(), 0.0, 0.0, 0.0 }
+  data := common.SensorData{ time.Now(), 0.0, 0.0, 0.0 }
   var err error
 
   times, ok := r.URL.Query()["ts"]

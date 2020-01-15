@@ -24,12 +24,14 @@ var (
 	GitHash   = "undefined"
 )
 
+const cfg_path = "config.json"
+
 func main() {
     log.Print("----- Start -----")
     log.Print( fmt.Sprintf( "----- Version: %v.%v ( %v, %v ) -----", Version, Commit, GitHash, BuildTime ) )
 
     log.Print("----- Load config -----")
-    cfg, err := config.Read("config.json")
+    cfg, err := config.Read( cfg_path )
     if err != nil {
         log.Print("Failed to read configuration from file")
         return
@@ -64,7 +66,7 @@ func main() {
     defer botCtx.ChatsDb.SaveToFile()
 
     // run HTTP API handler
-    api.RunAPIHandler( cfg )
+    api.RunAPIHandler( cfg, botCtx.HomeCtrl )
 
     // Create and registrate commands
     cmds := map[string]cmdprocessor.CommandProcIf {
@@ -151,6 +153,7 @@ func main() {
     }
 
     ticker.Stop()
+    cfg.Write( cfg_path )
 
     log.Print("----- Stop -----")
 }
