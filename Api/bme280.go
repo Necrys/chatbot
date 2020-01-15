@@ -18,6 +18,8 @@ type bme280APIHandler struct {
 var SensorsHistory *ring.Ring
 
 func newBME280APIHandler ( cfg *config.Config, hc *bot.SmartHomeController ) *bme280APIHandler {
+  bot.Debug( "newBME280APIHandler %v+", hc )
+
   handler := &bme280APIHandler { homeCtrl : hc }
   SensorsHistory = ring.New( cfg.HomeMon.HistorySize )
   return handler

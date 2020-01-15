@@ -18,17 +18,18 @@ type Context struct {
 }
 
 func NewContext(cfg *config.Config) (*Context, error) {
+  log.Print( "NewContext" )
+  SetDebug( cfg.Debug )
   ctx := &Context { Admins    : make(map[string]bool),
                     Waiting   : make(chan bool),
                     Debug     : cfg.Debug,
                     ChatsDb   : NewKnownChatsDB(),
                     UserLocDb : NewUserLocationsDB() }
-
+  
   ctx.HomeCtrl = NewSmartHomeController( cfg, ctx )
 
   ctx.ChatsDb.LoadFromFile()
   ctx.UserLocDb.LoadFromFile()
-  SetDebug( ctx.Debug )
 
   ctx.Admins[ "__thisbot__" ] = true;
 

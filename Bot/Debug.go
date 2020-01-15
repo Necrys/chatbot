@@ -8,7 +8,7 @@ var debugOn bool
 
 func Debug( fmt string, args ...interface{} ) {
   if debugOn {
-    log.Printf( fmt, args )
+    log.Printf( fmt, args... )
   }
 }
 

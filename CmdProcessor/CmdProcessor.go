@@ -30,6 +30,8 @@ type CmdRegistry struct {
     aliases  map[string]string
 }
 
+var essentialCommands = [...]string{ "stop", "restart", "goadmin", "noadmin" }
+
 func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*CmdRegistry, error) {
     if len(commands) == 0 {
         return nil, errors.New("No command processors passed")
@@ -37,6 +39,15 @@ func NewCmdRegistry(cfg *config.Config, commands map[string]CommandProcIf) (*Cmd
 
     this := &CmdRegistry{ make(map[string]CommandProcIf),
                           make(map[string]string) }
+
+    // add essential commands
+    for _, v := range essentialCommands {
+        cmd, ok := commands[v]
+        if ok == true {
+            this.commands[v] = cmd
+            delete(commands, v)
+        }
+    }
 
     for _, v := range cfg.Commands {
         cmd, ok := commands[v]
