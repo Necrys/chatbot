@@ -40,7 +40,7 @@ func ( this* CmdShowKeyboard ) HandleCommand( cmdCtx cmdprocessor.CommandCtxIf )
 
   if showKeyboard == true {
     var homeKb [][]string
-    var row = []string{ "Сейчас", "Температура", "Влажность", "Давление", }
+    var row = []string{ "📝", "🌡", "💧", "⏱", }
     homeKb = append( homeKb, row )
 
     cmdCtx.ShowKeyboard( homeKb )
